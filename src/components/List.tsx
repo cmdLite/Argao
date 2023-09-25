@@ -93,7 +93,6 @@ const List = () => {
         <th className="p-2 border rounded">Meeting Name</th>
         <th className="p-2 border rounded">Race Number</th>
         <th className="p-2 border rounded">Countdown Timer</th>
-        <th className="p-2 border rounded">Time Schedule</th>
       </tr>
     </thead>
     {paddedRaceSummaries.length > 0 ? (
