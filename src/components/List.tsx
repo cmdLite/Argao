@@ -105,7 +105,6 @@ const List = () => {
           <td className="p-2 border rounded">{raceSummary.meeting_name}</td>
           <td className="p-2 border rounded text-center">{raceSummary.race_number}</td>
           <td className="p-2 border rounded text-center"><Countdown scheduledTime={raceSummary.advertised_start.seconds} /></td>
-          <td className="p-2 border rounded text-center">{advertisedStart(raceSummary.advertised_start?.seconds || 0)}</td>
         </tr>
       ))}
     </tbody>
