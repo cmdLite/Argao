@@ -1,20 +1,19 @@
-import React,{useEffect} from "react";
-import { useAppSelector, RootState, useAppDispatch } from "../store/store";
-import { selectNextToGo, fetchData } from "../store/features/dataSlice";
+import React, { useState, useEffect } from "react";
+import { useAppSelector, RootState } from "../store/store";
+import { selectRaceSummaries, selectDataStatus } from "../store/features/dataSlice";
 import Countdown from "./Countdown";
 
-
 const List = () => {
-    const dispatch = useAppDispatch();
-  const data = useAppSelector((state: RootState) => selectNextToGo(state));
+  const data = useAppSelector((state: RootState) => selectRaceSummaries(state));
+  const status = useAppSelector((state: RootState) => selectDataStatus(state));
+  console.log("Data",data);
+  console.log("Status",status);
 
-  const [categoryFilter, setCategoryFilter] = React.useState<string | null>(null);
+  const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
+  const [raceSummaries, setRaceSummaries] = useState(data ? Object.values(data) : []);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  const raceSummaries = data.raceSummaries ? Object.values(data.raceSummaries) : [];
-
-  console.log(data);
-
-  const now = new Date().getTime() / 1000;
+  let now = new Date().getTime() / 1000;
 
   const sortedRaceSummaries = raceSummaries
     .filter((raceSummary) => raceSummary.advertised_start.seconds + 60 > now)
@@ -24,29 +23,37 @@ const List = () => {
       return aTime - bTime;
     });
 
-  const advertisedStart = (time: number): React.ReactNode => {
-    const date = new Date(time * 1000);
-    return <span>{date.toLocaleTimeString()}</span>;
-  };
+  useEffect(() => {
+    setRaceSummaries(data ? Object.values(data) : []);
+    setTimeout(()=> setIsLoading(false), 2000)
+  }, [data]);
+
+  useEffect(() => {
+    const intervalId = setInterval(() => { 
+      setRaceSummaries((prevRaceSummaries) => {
+        const updatedRaceSummaries = prevRaceSummaries.filter((raceSummary) => {
+          const raceStartTime = raceSummary.advertised_start.seconds;
+          const timeDiff = raceStartTime - now;
+          return timeDiff > -60;
+        });
+        return updatedRaceSummaries;
+      });
+    }, 1000);
+
+    return () => clearInterval(intervalId);
+  }, [now,raceSummaries]);
 
   const handleCategoryFilter = (categoryId: string | null) => {
+    setIsLoading(true);
     setCategoryFilter(categoryId);
+    setTimeout(()=> setIsLoading(false), 2000)
   };
 
-  
   const filteredRaceSummaries = categoryFilter
     ? sortedRaceSummaries.filter((raceSummary) => raceSummary.category_id === categoryFilter)
     : sortedRaceSummaries;
 
-  const paddedRaceSummaries = filteredRaceSummaries ? Object.values(filteredRaceSummaries).slice(0,5) : [];
-
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      dispatch(fetchData());
-    }, 5000);
-
-    return () => clearInterval(intervalId);
-  }, [dispatch]);
+  const paddedRaceSummaries = filteredRaceSummaries.slice(0, 5);
 
   return (
     <div className="rounded-md shadow border m-2 p-2 flex flex-col items-center">
@@ -86,40 +93,39 @@ const List = () => {
         All
       </button>
     </div>
-
-  <table className="rounded-md w-1/2 mb-20">
-    <thead>
-      <tr className="bg-gradient-to-b from-sky-400 to-sky-600 text-white">
+      <table className="table-auto w-1/2 mb-20">
+        <thead>
+        <tr className="bg-gradient-to-b from-sky-400 to-sky-600 text-white">
         <th className="p-2 border rounded">Meeting Name</th>
         <th className="p-2 border rounded">Race Number</th>
         <th className="p-2 border rounded">Countdown Timer</th>
-      </tr>
-    </thead>
-    {paddedRaceSummaries.length > 0 ? (
-    <tbody>
-      {paddedRaceSummaries.map((raceSummary, index) => (
-        <tr key={index} 
-        className="race-summary" 
-        data-advertised-start-seconds={raceSummary.advertised_start?.seconds || 0}>
-          <td className="p-2 border rounded">{raceSummary.meeting_name}</td>
-          <td className="p-2 border rounded text-center">{raceSummary.race_number}</td>
-          <td className="p-2 border rounded text-center"><Countdown scheduledTime={raceSummary.advertised_start.seconds} /></td>
-        </tr>
-      ))}
-    </tbody>
-  
-) : (
-    <tbody>
-    <tr className="h-24">
-      <td className="border p-2 text-center" colSpan={3}>
-        No data available.
-      </td>
-    </tr>
-  </tbody>
-)
-}
-</table>
-  </div>
+          </tr>
+        </thead>
+        <tbody>
+          {paddedRaceSummaries.map((raceSummary, index) => (
+            <tr key={index}>
+              <td className="border px-4 py-2">{raceSummary.race_name}</td>
+              <td className="border px-4 py-2">
+                {raceSummary.race_number}
+              </td>
+              <td className="border px-4 py-2">
+                {isLoading ? "Loading..." : 
+                <Countdown
+                  scheduledTime={raceSummary.advertised_start.seconds}
+                  onCountdownFinish={() => {
+                    setRaceSummaries((prevRaceSummaries) =>
+                      prevRaceSummaries.filter((prevRaceSummary) => prevRaceSummary.id !== raceSummary.id)
+                    );
+                  }}
+                />
+                }
+                
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 };
 

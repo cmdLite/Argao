@@ -1,8 +1,12 @@
-//Component for displaying the countdown timer
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 
-const Countdown: React.FC<{ scheduledTime: number }> = ({ scheduledTime }) => {
-  const [timeRemaining, setTimeRemaining] = useState(""); 
+interface Props {
+  scheduledTime: number;
+  onCountdownFinish: () => void;
+}
+
+const Countdown: React.FC<Props> = ({ scheduledTime, onCountdownFinish }) => {
+  const [timeRemaining, setTimeRemaining] = useState("");
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -20,9 +24,9 @@ const Countdown: React.FC<{ scheduledTime: number }> = ({ scheduledTime }) => {
     }, 1000);
 
     return () => clearInterval(intervalId);
-  }, [scheduledTime]);
+  }, [scheduledTime, onCountdownFinish]);
 
-  return <span>{timeRemaining}</span>;
+  return  <span>{timeRemaining}</span>;
 };
 
 export default Countdown;
