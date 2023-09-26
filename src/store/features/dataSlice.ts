@@ -44,7 +44,8 @@ export const fetchData = createAsyncThunk("data/fetchData", async () => {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        "Host": "api.neds.com.au"
+        "Host": "api.neds.com.au",
+        'Access-Control-Allow-Origin':'https://argao.vercel.app'
       },
     }
   );
