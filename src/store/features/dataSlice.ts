@@ -37,14 +37,14 @@ const initialState: DataState = {
   error: null,
 };
 
+
 export const fetchData = createAsyncThunk("data/fetchData", async () => {
   const response = await fetch(apiUrl,
     {
       method: "GET",
-      mode: 'no-cors',
       headers: {
         "Content-Type": "application/json",
-        Accept: "application/json",
+        "Host": "api.neds.com.au"
       },
     }
   );
