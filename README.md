@@ -1,6 +1,29 @@
 # Getting Started with Create React App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app), using the [Redux](https://redux.js.org/) and [Redux Toolkit](https://redux-toolkit.js.org/) TS template.
+This project was made with [Create React App](https://github.com/facebook/create-react-app), using the [Redux](https://redux.js.org/) and [Redux Toolkit](https://redux-toolkit.js.org/) TS template.
+
+## Install Locally
+
+First install node.js and npm in your computer
+
+You can download them here:
+
+https://nodejs.org/en
+https://www.npmjs.com/
+
+Then create a local folder in your system and clone the repositroy in that folder
+
+You can open your terminal and path your folder into it type the following
+
+### `git clone https://github.com/cmdLite/Argao.git`
+
+Take note that you need git to be installed in your system
+
+after cloning the repository, run vscode and open the repository folder.
+
+then on vscode push the grave key near number 1 on your keyboard to open the terminal and run the following scripts:
+
+### `npm install`
 
 ## Available Scripts
 
