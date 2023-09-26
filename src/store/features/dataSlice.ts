@@ -1,6 +1,8 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { RootState } from "../store";
 
+const apiUrl = "https://api.neds.com.au/rest/v1/racing/?method=nextraces&count=100";
+
 interface RaceSummary {
   advertised_start: {
     seconds: number;
@@ -36,8 +38,7 @@ const initialState: DataState = {
 };
 
 export const fetchData = createAsyncThunk("data/fetchData", async () => {
-  const response = await fetch(
-    "https://api.neds.com.au/rest/v1/racing/?method=nextraces&count=100",
+  const response = await fetch(apiUrl,
     {
       method: "GET",
       headers: {
@@ -46,6 +47,9 @@ export const fetchData = createAsyncThunk("data/fetchData", async () => {
       },
     }
   );
+  if (!response.ok) {
+    throw new Error("Failed to fetch data");
+  }
   const data = await response.json();
   const responseData = data.data;
   if (Array.isArray(responseData.race_summaries)) {
@@ -82,8 +86,9 @@ export const DataSlice = createSlice({
   },
 });
 
-console.log(DataSlice)
-
-export const selectNextToGo = (state: RootState) => state.data;
+export const selectNextToGo = (state: RootState) => state.data.nextToGo;
+export const selectRaceSummaries = (state: RootState) => state.data.raceSummaries;
+export const selectDataStatus = (state: RootState) => state.data.status;
+export const selectDataError = (state: RootState) => state.data.error;
 
 export default DataSlice.reducer;
